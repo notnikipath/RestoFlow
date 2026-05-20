@@ -1,0 +1,170 @@
+﻿services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: restoflow-api-gateway
+    env_file: .env
+    ports:
+      - "32018:8500"
+    depends_on:
+      - reservation-service
+      - menu-service
+      - order-service
+      - kitchen-service
+      - inventory-service
+      - staff-service
+      - analytics-service
+      - notification-service
+    networks: [restoflow-net]
+
+  reservation-service:
+    build:
+      context: .
+      dockerfile: reservation-service/Dockerfile
+    container_name: restoflow-reservation
+    env_file: .env
+    ports:
+      - "32019:8501"
+    depends_on:
+      - postgres
+      - redis
+    networks: [restoflow-net]
+
+  menu-service:
+    build:
+      context: .
+      dockerfile: menu-service/Dockerfile
+    container_name: restoflow-menu
+    env_file: .env
+    ports:
+      - "8502:8502"
+    depends_on:
+      - redis
+    networks: [restoflow-net]
+
+  order-service:
+    build:
+      context: .
+      dockerfile: order-service/Dockerfile
+    container_name: restoflow-order
+    env_file: .env
+    ports:
+      - "8503:8503"
+    depends_on:
+      - postgres
+      - redis
+    networks: [restoflow-net]
+
+  kitchen-service:
+    build:
+      context: .
+      dockerfile: kitchen-service/Dockerfile
+    container_name: restoflow-kitchen
+    env_file: .env
+    ports:
+      - "8504:8504"
+    depends_on:
+      - rabbitmq
+      - redis
+    networks: [restoflow-net]
+
+  inventory-service:
+    build:
+      context: .
+      dockerfile: inventory-service/Dockerfile
+    container_name: restoflow-inventory
+    env_file: .env
+    ports:
+      - "32020:8505"
+    depends_on:
+      - postgres
+      - rabbitmq
+    networks: [restoflow-net]
+
+  staff-service:
+    build:
+      context: .
+      dockerfile: staff-service/Dockerfile
+    container_name: restoflow-staff
+    env_file: .env
+    ports:
+      - "8506:8506"
+    depends_on:
+      - postgres
+    networks: [restoflow-net]
+
+  analytics-service:
+    build:
+      context: .
+      dockerfile: analytics-service/Dockerfile
+    container_name: restoflow-analytics
+    env_file: .env
+    ports:
+      - "32021:8507"
+    depends_on:
+      - postgres
+      - redis
+    networks: [restoflow-net]
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    container_name: restoflow-notification
+    env_file: .env
+    ports:
+      - "8508:8508"
+    depends_on:
+      - redis
+      - rabbitmq
+    networks: [restoflow-net]
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        VITE_API_GATEWAY_URL: http://localhost:32018
+    container_name: restoflow-frontend
+    env_file: .env
+    ports:
+      - "32022:5177"
+    depends_on:
+      - api-gateway
+    networks: [restoflow-net]
+
+  postgres:
+    image: postgres:16
+    container_name: restoflow-postgres
+    environment:
+      POSTGRES_DB: restoflow
+      POSTGRES_USER: restoflow
+      POSTGRES_PASSWORD: restoflow
+    ports:
+      - "32023:5432"
+    volumes:
+      - restoflow_postgres_data:/var/lib/postgresql/data
+    networks: [restoflow-net]
+
+  redis:
+    image: redis:7
+    container_name: restoflow-redis
+    ports:
+      - "32024:6379"
+    networks: [restoflow-net]
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: restoflow-rabbitmq
+    ports:
+      - "5673:5672"
+      - "15673:15672"
+    networks: [restoflow-net]
+
+networks:
+  restoflow-net:
+    driver: bridge
+
+volumes:
+  restoflow_postgres_data:
