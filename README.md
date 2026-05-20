@@ -44,7 +44,7 @@ RestoFlow is a microservice platform for restaurant business automation: table r
 ## Local run
 
 ```bash
-cd d:\Шарага\Кинжа7\Task_20_RestoFlow
+cd 'your/project/folder'
 docker compose up --build -d
 ```
 
