@@ -1,4 +1,4 @@
-﻿# RestoFlow
+# RestoFlow
 
 RestoFlow is a microservice platform for restaurant business automation: table reservations, menu management, waiter order intake, kitchen execution, inventory control, staff planning, and analytics.
 
@@ -44,7 +44,7 @@ RestoFlow is a microservice platform for restaurant business automation: table r
 ## Local run
 
 ```bash
-cd 'your/project/folder'
+cd RestoFlow
 docker compose up --build -d
 ```
 
